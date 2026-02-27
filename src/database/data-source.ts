@@ -1,23 +1,29 @@
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
-export const db = new Pool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+export async function connectDB() {
+  try {
+    const db = await mysql.createConnection({
+      host: process.env.DB_HOST!,
+      user: process.env.DB_USER!,
+      password: process.env.DB_PASSWORD!,
+      database: process.env.DB_NAME!,
+      port: Number(process.env.DB_PORT)|| 3306,
 
-  ssl: false, // true só se for servidor online
-});
+      // ✅ SSL (OBRIGATÓRIO NO ALWAYS)
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
 
-// Teste automático
-db.on('connect', () => {
-  console.log('✅ Conectado ao PostgreSQL');
-});
+    console.log("✅ Banco conectado com sucesso!");
+    return db;
 
-db.on('error', (err) => {
-  console.error('❌ Erro no PostgreSQL:', err);
-});
+  } catch (error) {
+    console.error("❌ Erro ao conectar no banco:", error);
+    throw error;
+  }
+}

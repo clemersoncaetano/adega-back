@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { db } from './database/data-source';
 import pedidosRoutes from './routes/pedidos.routes';
 import carrinhoRoutes from './routes/carrinho.routes';
 import categoriasRoutes from "./routes/categoria.routes";
@@ -15,16 +14,19 @@ app.use(cors());
 
 
 // Testar conexao
-async function testarBanco() {
-  try {
-    await db.query('SELECT 1');
-    console.log('Banco funcionando');
-  } catch (err) {
-    console.error('Falha no banco:', err);
-  }
+import { connectDB } from "./database/data-source";
+
+async function startServer() {
+  await connectDB();
+
+  app.listen(3000, () => {
+    console.log("Servidor rodando na porta 3000");
+  });
+  
 }
 
-testarBanco();
+startServer();
+
 
 app.use("/api/categorias", categoriasRoutes);
 app.use('/api', pedidosRoutes);
