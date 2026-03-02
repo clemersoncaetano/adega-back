@@ -14,19 +14,14 @@ app.use(cors());
 
 
 // Testar conexao
-import { connectDB } from "./database/data-source";
+import { connectDB } from "../src/database/data-source";
 
 async function startServer() {
   await connectDB();
-
-  app.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000");
-  });
   
 }
 
 startServer();
-
 
 app.use("/api/categorias", categoriasRoutes);
 app.use('/api', pedidosRoutes);
