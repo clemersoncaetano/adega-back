@@ -13,3 +13,14 @@ CREATE TABLE IF NOT EXISTS pedido_itens (
   quantidade INT NOT NULL,
   preco_unitario NUMERIC(10,2) NOT NULL
 );
+CREATE TABLE drinks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  descricao TEXT,
+  preco DECIMAL(10,2) NOT NULL,
+  imagem VARCHAR(255),
+  categoria_id INT,
+
+  FOREIGN KEY (categoria_id)
+  REFERENCES categorias(id)
+);

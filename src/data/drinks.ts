@@ -26,4 +26,12 @@ export const drinks: Drink[] = [
     preco: 15,
     descricao: "Gin, licor de pessego  e especiarias",
   },
+
+
+{
+    id: "5",
+    nome: "BALY TRADICIONAL 2L",
+    preco:13,
+    descricao: "Gin, licor de pessego  e especiarias",
+  },
 ];
