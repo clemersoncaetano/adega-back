@@ -10,10 +10,9 @@ export const db = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 
-  ssl: false, // true só se for servidor online
+  ssl: false,
 });
 
-// Teste automático
 db.on('connect', () => {
   console.log('✅ Conectado ao PostgreSQL');
 });

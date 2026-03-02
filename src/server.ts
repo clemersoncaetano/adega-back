@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 
 
-// Testar conexao
+
 async function testarBanco() {
   try {
     await db.query('SELECT 1');

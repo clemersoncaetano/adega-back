@@ -3,12 +3,12 @@ import { categorias, categoria } from "../data/categoria";
 
 const router = Router();
 
-/* Listar categorias */
+
 router.get("/", (req, res) => {
   res.json(categorias);
 });
 
-/* Criar categoria */
+
 router.post("/", (req, res) => {
   console.log("BODY:", req.body);
 
@@ -22,12 +22,12 @@ router.post("/", (req, res) => {
 
   const novaCategoria: categoria = {
     id: Date.now(),
-    nome: String(nome) // garante string
+    nome: String(nome) 
   };
 
   categorias.push(novaCategoria);
 
-  res.status(201).json(novaCategoria); // retorna completo
+  res.status(201).json(novaCategoria); 
 });
 
 export default router;
