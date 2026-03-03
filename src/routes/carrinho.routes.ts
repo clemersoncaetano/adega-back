@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { drinks } from '../data/drinks';
+import { Router } from "express";
+import { listarDrinks } from "../models/drink.model";
 
 interface CarrinhoItem {
   drinkId: string;
@@ -9,16 +9,20 @@ interface CarrinhoItem {
 const carrinho: CarrinhoItem[] = [];
 const router = Router();
 
-function montarCarrinho() {
+
+async function montarCarrinho() {
+const drinks = (await listarDrinks()) as any[];
+
   const itens = carrinho
     .map((item) => {
+
       const drink = drinks.find((d) => d.id === item.drinkId);
 
-      if (!drink) {
-        return null;
-      }
+      if (!drink) return null;
 
-      const subtotal = Number((drink.preco * item.quantidade).toFixed(2));
+      const subtotal = Number(
+        (drink.preco * item.quantidade).toFixed(2)
+      );
 
       return {
         id: drink.id,
@@ -28,42 +32,54 @@ function montarCarrinho() {
         subtotal,
       };
     })
-    .filter((item): item is NonNullable<typeof item> => item !== null);
+    .filter(Boolean);
 
   const total = Number(
     itens
-      .reduce((acumulado, item) => acumulado + item.subtotal, 0)
+      .reduce((acc, item: any) => acc + item.subtotal, 0)
       .toFixed(2)
   );
 
-  return {
-    itens,
-    total,
-  };
+  return { itens, total };
 }
 
-router.get('/carrinho', (_req, res) => {
-  res.json(montarCarrinho());
+
+router.get("/carrinho", async (_req, res) => {
+
+  const carrinhoMontado = await montarCarrinho();
+
+  res.json(carrinhoMontado);
 });
 
-router.post('/carrinho/itens', (req, res) => {
+router.post("/carrinho/itens", async (req, res) => {
+
   const { drinkId, quantidade = 1 } = req.body;
 
-  if (!drinkId || typeof drinkId !== 'string') {
-    return res.status(400).json({ erro: 'drinkId e obrigatorio' });
+  if (!drinkId || typeof drinkId !== "string") {
+    return res.status(400).json({ erro: "drinkId é obrigatório" });
   }
 
   if (!Number.isInteger(quantidade) || quantidade <= 0) {
-    return res.status(400).json({ erro: 'quantidade deve ser um inteiro maior que zero' });
+    return res.status(400).json({
+      erro: "quantidade inválida",
+    });
   }
 
-  const drinkExiste = drinks.some((drink) => drink.id === drinkId);
 
-  if (!drinkExiste) {
-    return res.status(404).json({ erro: 'Drink nao encontrado' });
+  const drinks = (await listarDrinks()) as any[];
+
+  const drink = drinks.find((d) => d.id === drinkId);
+
+  if (!drink) {
+    return res.status(404).json({
+      erro: "Drink não encontrado",
+    });
   }
 
-  const itemExistente = carrinho.find((item) => item.drinkId === drinkId);
+ 
+  const itemExistente = carrinho.find(
+    (item) => item.drinkId === drinkId
+  );
 
   if (itemExistente) {
     itemExistente.quantidade += quantidade;
@@ -71,21 +87,30 @@ router.post('/carrinho/itens', (req, res) => {
     carrinho.push({ drinkId, quantidade });
   }
 
-  return res.status(201).json(montarCarrinho());
+  const carrinhoMontado = await montarCarrinho();
+
+  res.status(201).json(carrinhoMontado);
 });
 
-router.patch('/carrinho/itens/:drinkId', (req, res) => {
+router.patch("/carrinho/itens/:drinkId", async (req, res) => {
+
   const { drinkId } = req.params;
   const { quantidade } = req.body;
 
   if (!Number.isInteger(quantidade) || quantidade < 0) {
-    return res.status(400).json({ erro: 'quantidade deve ser um inteiro maior ou igual a zero' });
+    return res.status(400).json({
+      erro: "quantidade inválida",
+    });
   }
 
-  const index = carrinho.findIndex((item) => item.drinkId === drinkId);
+  const index = carrinho.findIndex(
+    (item) => item.drinkId === drinkId
+  );
 
   if (index === -1) {
-    return res.status(404).json({ erro: 'Item nao encontrado no carrinho' });
+    return res.status(404).json({
+      erro: "Item não encontrado",
+    });
   }
 
   if (quantidade === 0) {
@@ -94,25 +119,39 @@ router.patch('/carrinho/itens/:drinkId', (req, res) => {
     carrinho[index].quantidade = quantidade;
   }
 
-  return res.json(montarCarrinho());
+  const carrinhoMontado = await montarCarrinho();
+
+  res.json(carrinhoMontado);
 });
 
-router.delete('/carrinho/itens/:drinkId', (req, res) => {
+
+router.delete("/carrinho/itens/:drinkId", async (req, res) => {
+
   const { drinkId } = req.params;
-  const index = carrinho.findIndex((item) => item.drinkId === drinkId);
+
+  const index = carrinho.findIndex(
+    (item) => item.drinkId === drinkId
+  );
 
   if (index === -1) {
-    return res.status(404).json({ erro: 'Item nao encontrado no carrinho' });
+    return res.status(404).json({
+      erro: "Item não encontrado",
+    });
   }
 
   carrinho.splice(index, 1);
 
-  return res.status(204).send();
+  const carrinhoMontado = await montarCarrinho();
+
+  res.json(carrinhoMontado);
 });
 
-router.delete('/carrinho', (_req, res) => {
+
+router.delete("/carrinho", (_req, res) => {
+
   carrinho.length = 0;
-  return res.status(204).send();
+
+  res.sendStatus(204);
 });
 
 export default router;

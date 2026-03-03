@@ -4,13 +4,13 @@ import {
 
 const router = Router();
 
-// GET categorias
+
 router.get("/", async (req, res) => {
   const categorias = await listarCategorias();
   res.json(categorias);
 });
 
-// POST categoria
+
 router.post("/", async (req, res) => {
   const { nome } = req.body;
 
@@ -18,14 +18,12 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Nome é obrigatório" });
   }
 
-  const novaCategoria: categoria = {
-    id: Date.now(),
-    nome: String(nome) // garante string
-  };
+  const id = await criarCategoria(nome);
 
-  categorias.push(novaCategoria);
-
-  res.status(201).json(novaCategoria); // retorna completo
+  res.status(201).json({
+    id,
+    nome
+  });
 });
 
 export default router;

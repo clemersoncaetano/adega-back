@@ -4,7 +4,7 @@ import pedidosRoutes from './routes/pedidos.routes';
 import carrinhoRoutes from './routes/carrinho.routes';
 import categoriasRoutes from "./routes/categoria.routes";
 import cors from "cors";
-
+import drinkRoutes from "./routes/drink.routes";
 dotenv.config();
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 
-// Testar conexao
+
 import { connectDB } from "../src/database/data-source";
 
 async function startServer() {
@@ -22,7 +22,7 @@ async function startServer() {
 }
 
 startServer();
-
+app.use("/drinks", drinkRoutes);
 app.use("/api/categorias", categoriasRoutes);
 app.use('/api', pedidosRoutes);
 app.use('/api', carrinhoRoutes);

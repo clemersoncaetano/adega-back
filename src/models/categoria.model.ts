@@ -1,6 +1,6 @@
 import { connectDB } from "../database/data-source";
 
-// Criar categoria
+
 export async function criarCategoria(nome: string) {
   const db = await connectDB();
 
@@ -12,7 +12,7 @@ export async function criarCategoria(nome: string) {
   return (result as any).insertId;
 }
 
-// Listar categorias
+
 export async function listarCategorias() {
   const db = await connectDB();
 
