@@ -10,25 +10,37 @@ export interface Drink {
 }
 
 
-export async function criarDrink(drink: Drink) {
+export async function criarDrink(dados: any) {
+
   const db = await connectDB();
 
+  const [cat]: any = await db.query(
+    "SELECT id FROM categorias WHERE id = ?",
+    [dados.categoria_id]
+  );
+
+  if (cat.length === 0) {
+    throw new Error("Categoria inválida");
+  }
+
+ 
   const [result]: any = await db.query(
-    `INSERT INTO drinks 
-     (nome, descricao, preco, imagem, categoria_id)
-     VALUES (?, ?, ?, ?, ?)`,
+    `
+    INSERT INTO drinks
+    (nome, descricao, preco, imagem, categoria_id)
+    VALUES (?, ?, ?, ?, ?)
+    `,
     [
-      drink.nome,
-      drink.descricao,
-      drink.preco,
-      drink.imagem,
-      drink.categoria_id
+      dados.nome,
+      dados.descricao,
+      dados.preco,
+      dados.imagem,
+      dados.categoria_id,
     ]
   );
 
   return result.insertId;
 }
-
 export async function listarDrinks() {
   const db = await connectDB();
 

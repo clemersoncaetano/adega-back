@@ -1,17 +1,16 @@
 import { Router } from "express";
-import {
-  criarCategoria,listarCategorias} from "../models/categoria.model";
+import { listarCategorias } from "../models/categoria.model";
 
 const router = Router();
 
 
-router.get("/", async (req, res) => {
+router.get("/categorias", async (req, res) => {
   const categorias = await listarCategorias();
   res.json(categorias);
 });
 
 
-router.post("/", async (req, res) => {
+router.post("/categorias", async (req, res) => {
   const { nome } = req.body;
 
   if (!nome) {
@@ -27,3 +26,7 @@ router.post("/", async (req, res) => {
 });
 
 export default router;
+
+function criarCategoria(nome: any) {
+  throw new Error("Function not implemented.");
+}
