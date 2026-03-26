@@ -49,6 +49,17 @@ export async function listarDrinks() {
   return rows;
 }
 
+export async function listarDrinksPorCategoria(categoriaId: number) {
+  const db = await connectDB();
+
+  const [rows] = await db.query(
+    "SELECT * FROM drinks WHERE categoria_id = ?",
+    [categoriaId]
+  );
+
+  return rows;
+}
+
 
 export async function atualizarDrink(id: number, drink: Drink) {
   const db = await connectDB();

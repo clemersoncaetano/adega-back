@@ -1,32 +1,56 @@
 import { Router } from "express";
-import { listarCategorias } from "../models/categoria.model";
+import {
+  criarCategoria,
+  listarCategorias,
+} from "../models/categoria.model";
+import { listarDrinksPorCategoria } from "../models/drink.model";
 
 const router = Router();
 
-
-router.get("/categorias", async (req, res) => {
-  const categorias = await listarCategorias();
-  res.json(categorias);
+router.get("/categorias", async (_req, res) => {
+  try {
+    const categorias = await listarCategorias();
+    res.json(categorias);
+  } catch (error) {
+    console.error("Erro ao listar categorias:", error);
+    res.status(503).json({ erro: "Nao foi possivel conectar ao banco de dados" });
+  }
 });
 
+router.get("/categorias/:id/drinks", async (req, res) => {
+  try {
+    const categoriaId = Number(req.params.id);
+
+    if (Number.isNaN(categoriaId)) {
+      return res.status(400).json({ erro: "Id da categoria invalido" });
+    }
+
+    const drinks = await listarDrinksPorCategoria(categoriaId);
+    res.json(drinks);
+  } catch (error) {
+    console.error("Erro ao listar drinks da categoria:", error);
+    res.status(503).json({ erro: "Nao foi possivel conectar ao banco de dados" });
+  }
+});
 
 router.post("/categorias", async (req, res) => {
-  const { nome } = req.body;
+  try {
+    const { nome } = req.body;
 
-  if (!nome) {
-    return res.status(400).json({ error: "Nome é obrigatório" });
+    if (!nome) {
+      return res.status(400).json({ error: "Nome e obrigatorio" });
+    }
+
+    const id = await criarCategoria(nome);
+
+    res.status(201).json({
+      id,
+      nome,
+    });
+  } catch (error) {
+    console.error("Erro ao criar categoria:", error);
+    res.status(503).json({ erro: "Nao foi possivel conectar ao banco de dados" });
   }
-
-  const id = await criarCategoria(nome);
-
-  res.status(201).json({
-    id,
-    nome
-  });
 });
 
 export default router;
-
-function criarCategoria(nome: any) {
-  throw new Error("Function not implemented.");
-}
